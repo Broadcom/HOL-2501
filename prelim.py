@@ -100,12 +100,12 @@ if lsf.labcheck == False and checkfw == True:
             fwout = lsf.ssh('/usr/bin/python3 /tmp/checkfw.py', 'holuser@mainconsole', lsf.password)
             output = fwout.stdout
         except Exception as e:
-            lsf.write-output(f'Error running checkfw.py: {e}')
+            lsf.write_output(f'Error running checkfw.py: {e}')
     elif lsf.WMC:
         try:
             output = lsf.runwincmd('python C:\\Temp\\checkfw.py', 'mainconsole', 'Administrator', lsf.password, logfile=lsf.logfile)
         except Exception as e:
-            lsf.write-output(f'Error running checkfw.py: {e}')
+            lsf.write_output(f'Error running checkfw.py: {e}')
     while 'Good' not in output and ctr < maxctr:
         if lsf.LMC:
             fwout = lsf.ssh('/usr/bin/python3 /tmp/checkfw.py', 'holuser@mainconsole', lsf.password)

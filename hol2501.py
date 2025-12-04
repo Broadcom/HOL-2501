@@ -8,6 +8,7 @@ import json
 import pexpect
 import subprocess
 import time
+from colorama import Fore
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -118,7 +119,7 @@ def getEnvironmentVmidByName(inFqdn, token, verify, envName):
         session.trust_env = False
 
         response = session.get(url=url, data=payload, headers=headers, verify=verify )       
-        response.raise_for_status
+        response.raise_for_status()
         jResponse = response.json()
         
         if not (response.status_code < 200 or response.status_code >= 300):
@@ -1186,18 +1187,18 @@ def getOpsToken(inFqdn, username, password, authSource, verify):
         session = requests.Session()
         session.trust_env = False
         response = session.post(url=url, data=payload, headers=headers, verify=verify )
-        response.raise_for_status
+        response.raise_for_status()
 
         if not (response.status_code < 200 or response.status_code >= 300):
             jResponse = response.json()
-            response.raise_for_status
+            response.raise_for_status()
             return(jResponse["token"])    
               
     except requests.exceptions.HTTPError as e:
         print(f"{Fore.RED}ERROR:{Fore.WHITE} HTTP: {e}")
     except requests.exceptions.ConnectionError as e:
         print(f"{Fore.RED}ERROR:{Fore.WHITE} CONNECT: {e}")
-    except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout as e:
         print(f"{Fore.RED}ERROR:{Fore.WHITE} TIMEOUT: {e}")
     except requests.exceptions.RequestException as e:
         print(f"{Fore.RED}ERROR:{Fore.WHITE} REQUEST: {e}")
