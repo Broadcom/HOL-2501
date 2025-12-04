@@ -203,7 +203,7 @@ if not lsf.labcheck:
 
 labfilesSource = "/vpodrepo/2025-labs/2501/labfiles"
 labfilesDestination = f"{lsf.mc}"
-
+os.system(f'git submodule add https://github.com/vmware-aria-hol/hol-2501-lab-files {labfilesSource}')
 if lsf.WMC and os.path.exists(labfilesDestination) and os.path.exists(labfilesSource):
     try:
         hol.createFolder(f'{lsf.mc}', 'labfiles')
