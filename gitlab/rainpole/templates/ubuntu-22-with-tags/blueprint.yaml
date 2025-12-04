@@ -1,0 +1,59 @@
+name: Ubuntu 22 with Tags
+version: 1.0.0
+formatVersion: 1
+inputs:
+  size:
+    type: string
+    enum:
+      - tiny
+      - small
+    default: small
+    description: VM Size
+    title: Size
+  platform:
+    type: string
+    enum:
+      - vsphere
+      - aws
+    default: vsphere
+    description: Deploy to which platform
+    title: Platform
+  env:
+    type: string
+    enum:
+      - dev
+      - prod
+    default: dev
+    description: There can only be DEV
+    title: Environment
+resources:
+  On-Prem_VM:
+    type: Cloud.vSphere.Machine
+    properties:
+      image: ubuntu22
+      tags:
+        - key: env
+          value: "${input.env}"
+      flavor: "${input.size}"
+      constraints:
+        - tag: '${"cloud:" + input.platform + ":soft"}'
+        - tag: '${"env:" + input.env}'
+      networks:
+        - network: "${resource.Network_1.id}"
+          assignment: static
+          assignPublicIpAddress: false
+      customizationSpec: CentOS
+  Cloud_VM:
+    type: Cloud.vSphere.Machine
+    properties:
+      name: cloudvm
+      image: ubuntu22
+      flavor: "${input.size}"
+      constraints:
+        - tag: '${"env:" + input.env + ":hard"}'
+  Network_1:
+    type: Cloud.vSphere.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: "net:vsphere"

@@ -1,0 +1,22 @@
+name: Ubuntu 22
+version: 1.0.0
+formatVersion: 1
+inputs: {}
+resources:
+  ubuntu:
+    type: Cloud.vSphere.Machine
+    properties:
+      image: ubuntu22
+      flavor: small
+      constraints:
+        - tag: 'cloud:vsphere'
+      networks:
+        - network: '${resource.vsphere_network.id}'
+          assignment: static
+      dnsDomain: vcf.sddc.lab
+  vsphere_network:
+    type: Cloud.vSphere.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: 'net:vsphere'
