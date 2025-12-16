@@ -1,0 +1,42 @@
+name: Windows with cloudbase-init
+version: 1.0.0
+formatVersion: 1
+inputs: {}
+resources:
+  windows:
+    type: Cloud.Machine
+    properties:
+      image: Windows2022
+      flavor: large
+      customizeGuestOs: false
+      remoteAccess:
+        authentication: usernamePassword
+        username: Administrator
+        password: {REPLACE_WITH_PASSWORD}
+      cloudConfig: |
+        #ps1_sysnative
+          New-Item $env:SystemDrive\powershell_multipart.txt -type file -ErrorAction SilentlyContinue
+
+          $adapter = Get-NetAdapter | ? { $_.Name -eq "Ethernet0" }
+
+          $adapter | Remove-NetIpAddress -Confirm:$false
+          $adapter | Remove-NetRoute -Confirm:$false
+          $adapter | New-NetIpAddress -IPAddress ${resource.windows.networks.address[0]} -PrefixLength ${resource.Cloud_vSphere_Network_1.prefixLength} -DefaultGateway ${resource.windows.networks.gateway[0]}
+          $adapter | Set-DnsClientServerAddress -ServerAddresses ("10.0.0.2")
+          
+          Set-DnsClientGlobalSetting -SuffixSearchList "vcf.sddc.lab"
+          
+          Start-Sleep 15
+
+          $creds = New-Object System.Management.Automation.PSCredential "administrator@vcf.holo.lab",(ConvertTo-SecureString -String "{REPLACE_WITH_PASSWORD}" -AsPlainText -Force)
+          Add-Computer -NewName ${resource.windows.resourceName} -domainName "vcf.holo.lab" -Credential $creds -Restart
+      constraints:
+        - tag: cloud:vsphere
+      networks:
+        - network: "${resource.Cloud_vSphere_Network_1.id}"
+          assignment: static
+      dnsDomain: vcf.sddc.lab
+  Cloud_vSphere_Network_1:
+    type: Cloud.vSphere.Network
+    properties:
+      networkType: existing
